@@ -1,0 +1,48 @@
+<?php if ($this->czyZapisDoBazy): ?>
+    Zapisane poprawnie do bazy...
+<?php elseif ($this->czyZapisDoBazy === false): ?>
+    Błąd zapisu do bazy!!!
+<?php endif ?>
+
+<?php echo $this->form; ?>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        
+//        return true;
+        
+        $('form').submit(function() {
+            var errors = checkForm();
+            if ($.isEmptyObject(errors)) {
+                return true;
+            } else {
+                $("form ul.errors").remove();
+                for (var k in errors) {
+                    /* jesli sa bledy dla danego pola */
+                    if (Object.keys(errors[k]).length) {
+                        $("#"+k+"-element").append('<ul class="errors"></ul>');
+                        for (var kk in errors[k]) {
+                            $("#"+k+"-element ul.errors").append('<li>'+errors[k][kk]+'</li>');
+                        }
+                    }
+                }
+                return false;
+            }
+        });
+    });
+
+    function checkForm() {
+        var result;
+        $.ajax({
+            type: "POST",
+            url: 'index/check-form',
+            dataType: "json",
+            data: $("form").serialize(),
+            async: false,
+            success: function(response) {
+                result = response;
+            }
+        });
+        return result;
+    }
+</script>
